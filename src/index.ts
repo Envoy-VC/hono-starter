@@ -8,6 +8,12 @@ import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { trimTrailingSlash } from "hono/trailing-slash";
 
+// Routes
+
+import { openAPIRouteHandler } from "hono-openapi";
+
+import { routes } from "./routes/index.js";
+
 const app = new Hono();
 app.use(compress());
 app.use(cors());
@@ -16,9 +22,21 @@ app.use(prettyJSON());
 app.use(requestId());
 app.use(trimTrailingSlash());
 
-app.get("/", (c) => {
-  return c.text("Hello Hono!");
-});
+// Routes
+app.route("/", routes);
+
+app.get(
+  "/openapi.json",
+  openAPIRouteHandler(routes, {
+    documentation: {
+      info: {
+        description: "Simple Hono API",
+        title: "Hono Starter",
+        version: "1.0.0",
+      },
+    },
+  }),
+);
 
 const server = serve(
   {
