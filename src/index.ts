@@ -8,11 +8,10 @@ import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
 import { requestId } from "hono/request-id";
 import { trimTrailingSlash } from "hono/trailing-slash";
-
-// Routes
-
+// Plugins
 import { openAPIRouteHandler } from "hono-openapi";
 
+// Routes
 import { routes } from "./routes";
 
 const app = new Hono();
@@ -26,6 +25,7 @@ app.use(trimTrailingSlash());
 // Routes
 app.route("/", routes);
 
+// OpenAPI
 app.get(
   "/openapi.json",
   openAPIRouteHandler(routes, {
@@ -39,7 +39,6 @@ app.get(
   }),
 );
 
-// OpenAPI
 app.get("/playground", Scalar({ url: "/openapi.json" }));
 
 const server = serve(
