@@ -2,7 +2,8 @@
   "compilerOptions": {
     "jsx": "react-jsx",
     "jsxImportSource": "hono/jsx",
-    "module": "NodeNext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
     "outDir": "./dist",
     "skipLibCheck": true,
     "strict": true,

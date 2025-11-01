@@ -1,4 +1,5 @@
 import { serve } from "@hono/node-server";
+import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 // Middlewares
 import { compress } from "hono/compress";
@@ -12,7 +13,7 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 
 import { openAPIRouteHandler } from "hono-openapi";
 
-import { routes } from "./routes/index.js";
+import { routes } from "./routes";
 
 const app = new Hono();
 app.use(compress());
@@ -38,13 +39,18 @@ app.get(
   }),
 );
 
+// OpenAPI
+app.get("/playground", Scalar({ url: "/openapi.json" }));
+
 const server = serve(
   {
     fetch: app.fetch,
     port: 3000,
   },
   (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`);
+    const serverUrl = `http://localhost:${info.port}`;
+    console.log(`Server: ${serverUrl}`);
+    console.log(`Playground: ${serverUrl}/playground`);
   },
 );
 

@@ -5,7 +5,7 @@ import { describeRoute, resolver, validator } from "hono-openapi";
 export const todo = new Hono();
 
 const TodoSchema = Schema.Struct({
-  createdAt: Schema.Date,
+  createdAt: Schema.String,
   id: Schema.String,
   isCompleted: Schema.Boolean,
   title: Schema.String,
@@ -15,6 +15,8 @@ type Todo = Schema.Schema.Type<typeof TodoSchema>;
 
 const todos = new Map<string, Todo>();
 
+const GetTodosReturnSchema = Schema.standardSchemaV1(Schema.Array(TodoSchema));
+
 todo.get(
   "/",
   describeRoute({
@@ -22,19 +24,26 @@ todo.get(
       200: {
         content: {
           "application/json": {
-            schema: resolver(Schema.standardSchemaV1(Schema.Array(TodoSchema))),
+            schema: resolver(GetTodosReturnSchema),
           },
         },
-        description: "Successful Response",
+        description: "Success",
       },
     },
   }),
-  validator("json", Schema.standardSchemaV1(Schema.Undefined)),
   (c) => {
     const allTodos = Array.from(todos.values());
     return c.json(allTodos);
   },
 );
+
+const GetTodoRequestSchema = Schema.standardSchemaV1(
+  Schema.Struct({
+    id: Schema.String,
+  }),
+);
+
+const GetTodoReturnSchema = Schema.standardSchemaV1(TodoSchema);
 
 todo.get(
   "/:id",
@@ -43,24 +52,25 @@ todo.get(
       200: {
         content: {
           "application/json": {
-            schema: resolver(
-              Schema.standardSchemaV1(
-                Schema.Union(TodoSchema, Schema.Undefined),
-              ),
-            ),
+            schema: resolver(GetTodoReturnSchema),
           },
         },
-        description: "Successful Response",
+        description: "Success",
       },
     },
   }),
-  validator("json", Schema.standardSchemaV1(Schema.Undefined)),
+  validator("param", GetTodoRequestSchema),
   (c) => {
-    const id = c.req.param("id");
+    const { id } = c.req.valid("param");
     const todo = todos.get(id);
     return c.json(todo);
   },
 );
+
+const CreateTodoRequestSchema = Schema.standardSchemaV1(
+  TodoSchema.omit("id", "createdAt"),
+);
+const CreateTodoReturnSchema = Schema.standardSchemaV1(TodoSchema);
 
 todo.post(
   "/create",
@@ -69,76 +79,31 @@ todo.post(
       200: {
         content: {
           "application/json": {
-            schema: resolver(Schema.standardSchemaV1(TodoSchema)),
+            schema: resolver(CreateTodoReturnSchema),
           },
         },
-        description: "Successful Response",
+        description: "Successful response",
       },
     },
   }),
-  validator(
-    "json",
-    Schema.standardSchemaV1(TodoSchema.omit("id", "createdAt")),
-  ),
+  validator("json", CreateTodoRequestSchema),
   (c) => {
-    const id = crypto.randomUUID();
-    const createdAt = new Date();
     const data = c.req.valid("json");
-    const todo: Todo = { ...data, createdAt, id };
+    const id = crypto.randomUUID();
+    const createdAt = new Date().toISOString();
+    const todo = { ...data, createdAt, id };
     todos.set(id, todo);
     return c.json(todo);
   },
 );
 
-todo.delete(
-  "/:id",
-  describeRoute({
-    responses: {
-      200: {
-        content: {
-          "application/json": {
-            schema: resolver(
-              Schema.standardSchemaV1(
-                Schema.Struct({
-                  error: Schema.Union(Schema.String, Schema.Null),
-                  success: Schema.Boolean,
-                }),
-              ),
-            ),
-          },
-        },
-        description: "Successful Response",
-      },
-      404: {
-        content: {
-          "application/json": {
-            schema: resolver(
-              Schema.standardSchemaV1(
-                Schema.Struct({
-                  error: Schema.String,
-                  success: Schema.Boolean,
-                }),
-              ),
-            ),
-          },
-        },
-        description: "Not Found",
-      },
-    },
-  }),
-  validator("json", Schema.standardSchemaV1(Schema.Undefined)),
-  (c) => {
-    const id = c.req.param("id");
-    const todo = todos.get(id);
-    if (!todo) {
-      return c.json(
-        { error: "Todo not found", success: false },
-        { status: 404 },
-      );
-    }
-    todos.delete(id);
-    return c.json({ error: null, success: true });
-  },
+const UpdateTodoRequestSchema = Schema.standardSchemaV1(
+  Schema.partial(TodoSchema.omit("id", "createdAt")),
+);
+
+const UpdateTodoReturnSchema = Schema.standardSchemaV1(TodoSchema);
+const ErrorSchema = Schema.standardSchemaV1(
+  Schema.Struct({ error: Schema.String, success: Schema.Boolean }),
 );
 
 todo.patch(
@@ -148,45 +113,32 @@ todo.patch(
       200: {
         content: {
           "application/json": {
-            schema: resolver(Schema.standardSchemaV1(TodoSchema)),
+            schema: resolver(UpdateTodoReturnSchema),
           },
         },
-        description: "Successful Response",
+        description: "Successful response",
       },
       404: {
         content: {
           "application/json": {
-            schema: resolver(
-              Schema.standardSchemaV1(
-                Schema.Struct({
-                  error: Schema.String,
-                  success: Schema.Boolean,
-                }),
-              ),
-            ),
+            schema: resolver(ErrorSchema),
           },
         },
-        description: "Not Found",
+        description: "Error response",
       },
     },
   }),
-  validator(
-    "json",
-    Schema.standardSchemaV1(TodoSchema.omit("id", "createdAt")),
-  ),
+  validator("json", UpdateTodoRequestSchema),
   (c) => {
     const id = c.req.param("id");
+    const data = c.req.valid("json");
     const todo = todos.get(id);
     if (!todo) {
       return c.json(
-        {
-          error: "Todo not found",
-          success: false,
-        },
+        { error: "Todo not found", success: false },
         { status: 404 },
       );
     }
-    const data = c.req.valid("json");
     const updatedTodo = { ...todo, ...data };
     todos.set(id, updatedTodo);
     return c.json(updatedTodo);
