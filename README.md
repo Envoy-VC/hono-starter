@@ -99,7 +99,7 @@ pnpm start
 
 ## Scripts
 
-- `pnpm dev` - Start development server with hot reload (tsx watch)
+- `pnpm dev` - Start development server with hot reload (tsup)
 - `pnpm build` - Compile TypeScript to JavaScript
 - `pnpm start` - Run production server
 - `pnpm lint` - Run Biome linter and auto-fix issues
