@@ -12,7 +12,7 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 import { openAPIRouteHandler } from "hono-openapi";
 
 // Routes
-import { routes } from "./routes";
+import { routes } from "@/routes";
 
 const app = new Hono();
 app.use(compress());

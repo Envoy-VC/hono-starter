@@ -4,7 +4,10 @@
     "jsxImportSource": "hono/jsx",
     "module": "esnext",
     "moduleResolution": "bundler",
-    "outDir": "./dist",
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",

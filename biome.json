@@ -72,7 +72,7 @@
       },
       "correctness": {
         "noConstantMathMinMaxClamp": "error",
-        "noUndeclaredDependencies": "error",
+        "noUndeclaredDependencies": "off",
         "noUnusedImports": "error",
         "useHookAtTopLevel": "error"
       },

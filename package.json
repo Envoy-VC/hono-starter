@@ -13,13 +13,13 @@
     "@commitlint/config-conventional": "^20.0.0",
     "@types/node": "^20.11.17",
     "lefthook": "^2.0.2",
-    "tsx": "^4.7.1",
+    "tsup": "^8.5.0",
     "typescript": "^5.8.3"
   },
   "name": "hono-starter",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "dev": "tsup --watch --onSuccess 'node dist/index.js'",
     "format": "pnpm exec biome format --write",
     "lint": "pnpm exec biome check --write",
     "prepare": "lefthook install",
