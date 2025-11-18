@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 
-import { todo } from "./todo";
+import { todo } from "./todo.js";
 
 export const routes = new Hono();
 
