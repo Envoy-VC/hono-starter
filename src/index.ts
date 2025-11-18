@@ -1,7 +1,7 @@
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 // Middlewares
-import { compress } from "hono/compress";
+// import { compress } from "hono/compress";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { prettyJSON } from "hono/pretty-json";
@@ -14,7 +14,7 @@ import { openAPIRouteHandler } from "hono-openapi";
 import { routes } from "./routes";
 
 const app = new Hono();
-app.use(compress());
+// app.use(compress());
 app.use(cors());
 app.use(logger());
 app.use(prettyJSON());
