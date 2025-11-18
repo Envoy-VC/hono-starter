@@ -18,12 +18,9 @@
   },
   "name": "hono-starter",
   "scripts": {
-    "build": "tsup",
-    "dev": "tsup --watch --onSuccess 'node dist/index.js'",
     "format": "pnpm exec biome format --write",
     "lint": "pnpm exec biome check --write",
-    "prepare": "lefthook install",
-    "start": "node dist/index.js"
+    "prepare": "lefthook install"
   },
   "type": "module"
 }
