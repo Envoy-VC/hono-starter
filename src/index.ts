@@ -12,7 +12,7 @@ import { Hono } from "hono";
 // import { openAPIRouteHandler } from "hono-openapi";
 
 // Routes
-import { routes } from "./routes";
+// import { routes } from "./routes";
 
 const app = new Hono();
 // app.use(compress());
@@ -23,7 +23,11 @@ const app = new Hono();
 // app.use(trimTrailingSlash());
 
 // Routes
-app.route("/", routes);
+// app.route("/", routes);
+
+app.get("/", (c) => {
+  return c.text("Hello World!");
+});
 
 // OpenAPI
 // app.get(
