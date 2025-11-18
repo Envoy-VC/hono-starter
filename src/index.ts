@@ -1,4 +1,3 @@
-import { serve } from "@hono/node-server";
 import { Scalar } from "@scalar/hono-api-reference";
 import { Hono } from "hono";
 // Middlewares
@@ -12,7 +11,7 @@ import { trimTrailingSlash } from "hono/trailing-slash";
 import { openAPIRouteHandler } from "hono-openapi";
 
 // Routes
-import { routes } from "@/routes";
+import { routes } from "./routes";
 
 const app = new Hono();
 app.use(compress());
@@ -41,28 +40,5 @@ app.get(
 
 app.get("/playground", Scalar({ url: "/openapi.json" }));
 
-const server = serve(
-  {
-    fetch: app.fetch,
-    port: 3000,
-  },
-  (info) => {
-    const serverUrl = `http://localhost:${info.port}`;
-    console.log(`Server: ${serverUrl}`);
-    console.log(`Playground: ${serverUrl}/playground`);
-  },
-);
-
-process.on("SIGINT", () => {
-  server.close();
-  process.exit(0);
-});
-process.on("SIGTERM", () => {
-  server.close((err) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    process.exit(0);
-  });
-});
+// biome-ignore lint/style/noDefaultExport: safe
+export default app;
