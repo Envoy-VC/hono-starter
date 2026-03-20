@@ -2,7 +2,7 @@
   "dependencies": {
     "@hono/standard-validator": "^0.1.5",
     "@scalar/hono-api-reference": "^0.9.24",
-    "effect": "^3.18.4",
+    "effect": "^3.20.0",
     "hono": "^4.10.4",
     "hono-openapi": "^1.1.1"
   },
